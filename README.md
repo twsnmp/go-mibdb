@@ -7,9 +7,9 @@ Library that converts SNMP MIB names and OIDs
 [![Go Report Card](https://goreportcard.com/badge/twsnmp/go-mibdb)](https://goreportcard.com/report/twsnmp/go-mibdb)
 
 
-## Usage
+## Usage (使用方法)
 
-### Import
+### Import (インポート)
 
 ```go
 	import mibdb "github.com/twsnmp/go-mibdb"
@@ -17,8 +17,10 @@ Library that converts SNMP MIB names and OIDs
 
 ### Load MIBDB / Convert Name to OID / Convert OID to Name
 
+名前とOID間の相互変換
+
 ```go
-	m, err := NewMIBDB("./mib.txt")
+	m, err := mibdb.NewMIBDB("./mib.txt")
 	if err != nil {
 		fmt.Printf("NewMIBDB failed err=%v", err)
 		return
@@ -27,6 +29,20 @@ Library that converts SNMP MIB names and OIDs
 	fmt.Printf(".1.3.6.1.2.1.1.1.0=%s", m.OIDToName(".1.3.6.1.2.1.1.1.0"))
 
 ```
+# How to make MIB DB File(mib.txt) 
+
+To create mib.txt, execute the snmptranslate command of Net-SNMP as follows.
+
+mib.txtを作るには、Net-SNMPのsnmptranslateコマンドを次のように実行します。
+
+```
+$snmptranslate  -T os  > mib.txt
+```
+
+If an extended MIB is installed in the Net-SNMP environment, it can also be extended.
+
+Net-SNMPの環境に拡張MIBをインストールすれば、拡張MIBにも対応できます。
+
 
 # Copyright
 

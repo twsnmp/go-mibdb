@@ -16,7 +16,7 @@ type MIBDB struct {
 
 // NewMIBDB create new MIBDB struct
 func NewMIBDB(path string) (*MIBDB, error) {
-	m := MIBDB{
+	m := &MIBDB{
 		path:      path,
 		nameToOid: make(map[string]string),
 		oidToName: make(map[string]string),
@@ -50,7 +50,7 @@ func NewMIBDB(path string) (*MIBDB, error) {
 	if len(m.oidToName) < 1 || len(m.nameToOid) < 1 {
 		return nil, fmt.Errorf("Invalid MIBDB file format")
 	}
-	return &m, nil
+	return m, nil
 }
 
 // OIDToName convert OID to Name function
@@ -81,4 +81,13 @@ func (m *MIBDB) NameToOID(name string) string {
 		return o + "." + strings.Join(a[1:], ".")
 	}
 	return ".0.0"
+}
+
+// GetNameList : retrun Name list
+func (m *MIBDB) GetNameList() []string {
+	ret := []string{}
+	for n := range m.nameToOid {
+		ret = append(ret, n)
+	}
+	return ret
 }

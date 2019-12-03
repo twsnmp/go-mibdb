@@ -42,6 +42,21 @@ func Test_MIBDB(t *testing.T) {
 	if len(nl) < 1 {
 		t.Errorf("GetNameList return len=0")
 	}
+	m.Clear()
+	nl2 := m.GetNameList()
+	t.Log(nl2)
+	if len(nl2) != 0 {
+		t.Errorf("Clear Error")
+	}
+	if err := m.Load("mib.txt"); err != nil {
+		t.Errorf("Load err=%v", err)
+	}
+	if err := m.Add("test123", ".1.999"); err != nil {
+		t.Errorf("Add err=%v", err)
+	}
+	if m.NameToOID("test123") != ".1.999" {
+		t.Errorf("Add test = %s", m.NameToOID(".1.999"))
+	}
 	t.Log("Done")
 }
 

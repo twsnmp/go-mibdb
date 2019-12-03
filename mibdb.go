@@ -22,33 +22,8 @@ func NewMIBDB(path string) (*MIBDB, error) {
 		oidToName: make(map[string]string),
 		Errors:    []string{},
 	}
-	b, err := ioutil.ReadFile(path)
-	if err != nil {
+	if err := m.Load(path); err != nil {
 		return nil, err
-	}
-	a := strings.Split(string(b), "\n")
-	for i := 0; i < len(a)-1; i += 2 {
-		oid := strings.TrimSpace(a[i])
-		name := strings.TrimSpace(a[i+1])
-		na := strings.Split(name, ".")
-		if len(na) < 1 {
-			m.Errors = append(m.Errors, fmt.Sprintf("Invalid Line %#v = %#v", oid, name))
-			continue
-		}
-		sname := na[len(na)-1]
-		if val, ok := m.oidToName[oid]; ok {
-			m.Errors = append(m.Errors, fmt.Sprintf("Dup OID %#v=%#v : %#v", oid, name, val))
-			continue
-		}
-		if val, ok := m.nameToOid[sname]; ok {
-			m.Errors = append(m.Errors, fmt.Sprintf("Dup name %#v=%#v : %#v", oid, sname, val))
-			continue
-		}
-		m.oidToName[oid] = sname
-		m.nameToOid[sname] = oid
-	}
-	if len(m.oidToName) < 1 || len(m.nameToOid) < 1 {
-		return nil, fmt.Errorf("Invalid MIBDB file format")
 	}
 	return m, nil
 }
@@ -90,4 +65,57 @@ func (m *MIBDB) GetNameList() []string {
 		ret = append(ret, n)
 	}
 	return ret
+}
+
+// Clear : clear MIBDB
+func (m *MIBDB) Clear() {
+	m.nameToOid = make(map[string]string)
+	m.oidToName = make(map[string]string)
+	m.Errors = []string{}
+}
+
+// Load : Laod MIBDB
+func (m *MIBDB) Load(path string) error {
+	b, err := ioutil.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	a := strings.Split(string(b), "\n")
+	for i := 0; i < len(a)-1; i += 2 {
+		oid := strings.TrimSpace(a[i])
+		name := strings.TrimSpace(a[i+1])
+		na := strings.Split(name, ".")
+		if len(na) < 1 {
+			m.Errors = append(m.Errors, fmt.Sprintf("Invalid Line %#v = %#v", oid, name))
+			continue
+		}
+		sname := na[len(na)-1]
+		if val, ok := m.oidToName[oid]; ok {
+			m.Errors = append(m.Errors, fmt.Sprintf("Dup OID %#v=%#v : %#v", oid, name, val))
+			continue
+		}
+		if val, ok := m.nameToOid[sname]; ok {
+			m.Errors = append(m.Errors, fmt.Sprintf("Dup name %#v=%#v : %#v", oid, sname, val))
+			continue
+		}
+		m.oidToName[oid] = sname
+		m.nameToOid[sname] = oid
+	}
+	if len(m.oidToName) < 1 || len(m.nameToOid) < 1 {
+		return fmt.Errorf("Invalid MIBDB file format")
+	}
+	return nil
+}
+
+// Add : Add name and oid to MIBDB
+func (m *MIBDB) Add(name, oid string) error {
+	if val, ok := m.oidToName[oid]; ok {
+		return fmt.Errorf("Dup OID %#v=%#v : %#v", oid, name, val)
+	}
+	if val, ok := m.nameToOid[name]; ok {
+		return fmt.Errorf("Dup name %#v=%#v : %#v", oid, name, val)
+	}
+	m.oidToName[oid] = name
+	m.nameToOid[name] = oid
+	return nil
 }

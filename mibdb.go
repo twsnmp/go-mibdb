@@ -29,6 +29,20 @@ func NewMIBDB(path string) (*MIBDB, error) {
 	return m, nil
 }
 
+// NewMIBDBFromStr create new MIBDB struct
+func NewMIBDBFromStr(s, path string) (*MIBDB, error) {
+	m := &MIBDB{
+		path:      path,
+		nameToOid: make(map[string]string),
+		oidToName: make(map[string]string),
+		Errors:    []string{},
+	}
+	if err := m.LoadFromStr(s); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // OIDToName convert OID to Name function
 func (m *MIBDB) OIDToName(oid string) string {
 	if len(oid) > 0 && oid[0] != '.' {
@@ -81,7 +95,12 @@ func (m *MIBDB) Load(path string) error {
 	if err != nil {
 		return err
 	}
-	a := strings.Split(string(b), "\n")
+	return m.LoadFromStr(string(b))
+}
+
+// LoadFromStr : Load MIBDB from String
+func (m *MIBDB) LoadFromStr(s string) error {
+	a := strings.Split(s, "\n")
 	for i := 0; i < len(a)-1; i += 2 {
 		oid := strings.TrimSpace(a[i])
 		name := strings.TrimSpace(a[i+1])

@@ -1,3 +1,4 @@
+// Package mibdb : SNMP MIB Name to/from OID
 package mibdb
 
 import (
@@ -102,7 +103,7 @@ func (m *MIBDB) Load(path string) error {
 		m.nameToOid[sname] = oid
 	}
 	if len(m.oidToName) < 1 || len(m.nameToOid) < 1 {
-		return fmt.Errorf("Invalid MIBDB file format")
+		return fmt.Errorf("invalid MIBDB file format")
 	}
 	return nil
 }
@@ -110,10 +111,10 @@ func (m *MIBDB) Load(path string) error {
 // Add : Add name and oid to MIBDB
 func (m *MIBDB) Add(name, oid string) error {
 	if val, ok := m.oidToName[oid]; ok {
-		return fmt.Errorf("Dup OID %#v=%#v : %#v", oid, name, val)
+		return fmt.Errorf("dup OID %#v=%#v : %#v", oid, name, val)
 	}
 	if val, ok := m.nameToOid[name]; ok {
-		return fmt.Errorf("Dup name %#v=%#v : %#v", oid, name, val)
+		return fmt.Errorf("dup name %#v=%#v : %#v", oid, name, val)
 	}
 	m.oidToName[oid] = name
 	m.nameToOid[name] = oid
